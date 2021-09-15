@@ -1,0 +1,38 @@
+
+table {
+	/*border: 1px solid black;*/
+	width: 100%;
+	height: 500px;
+	margin: 50px 0px;
+	align-content: center;
+	border-spacing: 10px 10px;
+}
+
+table td {
+	border: 1px solid #888;
+	text-align: center;
+	vertical-align: middle;
+	position: relative;
+	border-radius: 8px;
+	background: #e6ffe6;
+	font-family: Geneva, Arial, Helvetica, sans-serif ;
+	font-size: 32px;
+	text-shadow: 4px 3px 0px rgba(0,0,0,0.25);
+
+}
+
+table td:hover {
+	background: #99ff99;
+}
+
+table td:hover:after {
+	content: '';
+	position: absolute;
+	top: 0px;
+	right: 0px; 
+	bottom: 0px;    
+	left: 0px;
+	border-radius: 8px;
+	box-shadow: 0 0 20px rgba(0,0,0,0.5);
+	cursor: pointer;
+}
