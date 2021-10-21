@@ -4,7 +4,7 @@
   )
 
 (define (fraction_step a pow-of-two) ; процедура для пошагового вычисления
-  (define max-pow-of-two 2) ; максимальная степень двойки в числителе
+  (define max-pow-of-two 8) ; максимальная степень двойки в числителе
   (cond ((= pow-of-two max-pow-of-two) ; при достижении последнего элемента дроби
          (/ (expt 2 max-pow-of-two) (expt a 2))) ; вычислить его
         (else (/ (expt 2 pow-of-two) ; иначе перейти к следующему элементу
@@ -12,7 +12,7 @@
 
 ;(display "Лаб.2 задание 2.2:")
 ;(newline)
-;(fraction 1)
+;(fraction 3.0)
 
 ; =========== zadanie 1 =============
 
@@ -55,7 +55,11 @@
                 (display "\t")
                 (display (func_2 current sqrt)) ; расчет 2-ой функ-ции используя встроенную ф-цию
                 (find_error current func_2) ; расчет погрешности для 2-ой функции
-                (newline)))))
+                (newline))))
+        (else
+         (display "NO\t") (display current)
+         (display "\tfunc not defined\tfunc not defined\tfunc not defined")(newline)
+         ))
   (cond ((< current end) ; если текущее значение меньше конечного
          (find_funcs (+ current step) step end))) ; то вычислить функции для следующего значения
   )

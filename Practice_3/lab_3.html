@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Practice 3</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<p align="center">
+		Київський національний університет імені Тараса Шевченка<br>
+		Факультет інформаційних технологій<br>
+		Кафедра програмних систем та технологій<br>
+		<br>
+		студент групи IПЗ-42<br>
+		Бровенко Вадим<br>
+		2021
+	</p>
+	<br>
+
+	<div class="inner">
+		<h2 align="center">
+		Лабораторная робота №3 <br>
+		Тема: формы lambda и let, выражение присвоения set! для решения нелинейных уравнений и численного интегрирования<br>
+	</h2>
+		<h3 align="center">Вариант 2</h3>
+		<h3>Cодержание</h3>
+		<a href="#choose">Обоснование выбора языка программирования и IDE</a> <br>
+		<a href="#task1">Задание 1</a> <br>
+		<a href="#task2">Задание 2</a> <br>
+		<a href="#conclusion">Выводы</a>
+
+
+		<h3>Обоснование выбора языка программирования и IDE <a name="choose"></a></h3>
+		<p>
+			Для выполнения задач был выбран язык программирования Scheme, т.к. он является строго функциональным и прост в освоении благодаря упрощенному синтаксису языка.<br>
+			Среда разработки была выбрана DrRacket, так как она является бесплатной и имеет понятный и упрощенный интерфейс.
+		</p>
+		<h2>Задание 1. <a name="task1"></a></h2> <p>Найти корни нелинейного уравнения вида x = ln(x) + 2. Поиск приближенного значения хотя бы одного корня уравнения f(x) = 0 на отрезке [a; b] осуществлять методами перебора и касательных. Значения а, b интервала выбрать самостоятельно. Сравнить результаты решений двумя методами.</p>
+			<h3>HIPO диаграмма метод Ньютона:</h3>
+			<img src="hipo_1_1.png">
+
+			<h3>HIPO диаграмма метод простой итерации:</h3>
+			<img src="hipo_1_2.png">
+		
+		<h3>Код программы с комментариями:</h3>
+<pre class="code">
+; =========== zadanie 1 ============= <br>
+; заданная функция <br>
+(define (func x) <br>
+  (+ (log x) 2)) <br>
+<br>
+; значение точности e <br>
+(define e 0.001) <br>
+<br>
+; производная от заданной функции <br>
+(define (deriv) <br>
+  (lambda (x) <br>
+         (/ 1 x))) <br>
+<br>
+; вторая производная от заданной функции <br>
+(define (deriv-2) <br>
+  (lambda (x) <br>
+    (/ -1 (expt x 2)))) <br>
+ <br>
+; вычисление слудующего приближения корня <br>
+(define (newton-next f) <br>
+  (lambda (x)<br>
+    (- x (/ (f x) ((deriv) x)))))<br>
+
+(define num_x 0) ; номер корня приближения <br>
+; метод Ньютона <br>
+(define (newton-method f guess) <br>
+  (let ((next-guess ((newton-next f) guess))) ; поиск следующего корня  <br>
+    ;(cond ((< (abs (/ (f guess) ((deriv) guess))) e) <br>
+    (cond ((< (abs (f guess)) e) ; если f(приближение) меньше заданной точности, значит найдено <br>
+           (display "Find! ") (display "x") (display num_x) <br>
+           (display " = ")(display guess) <br>
+           (display " func(x)= ") (display (f guess))) <br>
+          (else <br>
+           (display "x") (display num_x) (display " = ") (display guess) (newline) <br>
+           (set! num_x (+ num_x 1)) <br>
+           (newton-method f next-guess))))) ; переход на след итерацию со следующим приближением <br>
+<br>
+; Ньютон: проверка заданного интервала <br>
+(define (newton-interval f a b) <br>
+  (display "======Newton method======") (newline) <br>
+  (cond ((> (* (f a) ((deriv-2) a))) ; условие сходимости для начального приближения левой границы<br>
+         (display "first_approx: left_border") (newline)<br>
+         (newton-method f a)<br>
+         )<br>
+        ((> (* (f b) ((deriv-2) b))) ; условие сходимости для начального приближения правой границы<br>
+         (display "first_approx: right_border") (newline)<br>
+         (newton-method f b)<br>
+         )<br>
+        (else<br>
+         (display "error borders"))))<br>
+<br>
+; Метод простых итераций<br>
+(define (iterate-method f guess)<br>
+  (let ((next (f guess)))<br>
+    (cond ((<= (abs (- guess next)) e) ; если разница между приближение и f(приближение) меньше точности<br>
+           (display "Find! ") (display "x") (display num_x) ; значит приближение найдено<br>
+           (display " = ")(display guess) (display "; f(x)=")(display (abs (- guess next))))<br>
+          (else ; иначе переход к следующей итерации со следующим приближением<br>
+           (display "x") (display num_x) (display " = ") (display guess) (newline)<br>
+           (set! num_x (+ num_x 1))<br>
+           (iterate-method f next)))))<br>
+<br>
+; Метод итераций: проверка заданного интервала           <br>
+(define (iterate-interval f a b)<br>
+  (newline)<br>
+  (display "======Iterate method======") (newline)<br>
+  (cond ((< (abs((deriv) a)) 1) ; условие сходимости для начального приближения левой границы<br>
+         (display "first_approx: left_border") (newline)<br>
+         (iterate-method f a)<br>
+         )<br>
+        ((< (abs((deriv) b)) 1) ; условие сходимости для начального приближения правой границы<br>
+         (display "first_approx: right_border") (newline)<br>
+         (iterate-method f b)<br>
+         )<br>
+        (else<br>
+         (display "error borders"))))<br>
+<br>
+(display "Лаб №3 задание 2.1:")<br>
+(newline)<br>
+;(newton-interval func 0.01 1.1)<br>
+(iterate-interval func 1 2)<br>
+</pre>
+		<h3>Скриншот результата работы метода Ньютона:</h3>
+		<img src="result_1.1.jpg">
+		<h3>Скриншот результата работы метода простой итерации:</h3>
+		<img src="result_1.2.jpg">
+		<h3>Анализ достоверности результатов:</h3>
+		<p>Для проверки достоверности результатов для расчета нелинейных уравнений методом Ньютона был использовн онлайн сервис https://planetcalc.ru/7748/ и для метода итераций https://planetcalc.ru/2824/</p>
+		<h3>Скриншот проверки результата работы метода Ньютона:</h3>
+		<img src="example_1.1.jpg" width="90%">
+		<h3>Скриншот проверки результата работы метода простой итерации:</h3>
+		<img src="example_1.2.jpg" width="90%">
+		<h2>Задание 2. <a name="task2"></a></h2> <p>С помощью формулы Симпсона интеграл функции f(x) от а до b приближенно выичисляется в виде:</p>
+		<img src="task_2.jpg">
+		<p>
+			где h = (b - a) / n для какого-нибудь четного целого числа n, yk = f(a + kh). Увеличение n повышает точность приближенного вычисления. Определить процедуру, которая принимает в качестве аргументов f, a, b, n и возвращает значение интеграла, вычисленного по формуле Симпсона.
+		</p>
+		<img src="task_2_1.jpg">
+		<h3>HIPO-диаграмма:</h3>
+		<img src="hipo_2.png">
+		<h3>Код программы с комментариями:</h3>
+<pre class="code">
+(define PI 3.14159) <br>
+; вычисление подынтегрального выражения <br>
+(define (integral x) <br>
+  (define root (- 1 (* x x))) <br>
+  (/ (sin x) (sqrt root))) <br>
+  ;(cond ((<= root 0) <br>
+  ;       0) <br>
+  ;      ((= (sqrt root) 0) <br>
+  ;       0) <br>
+  ;      (else <br>
+  ;       (/ (sin x) (sqrt root))))) <br>
+<br>
+(define i 0) ; счетчик элементов <br>
+(define result 0.0) <br>
+; метод Симпсона <br>
+(define (simpson-method f a b h n) <br>
+  (cond ((> a b) ; при достижении конца промежутка вывести результат <br>
+         (display "result: ")(display (* (/ h 3) result)) (newline)) <br>
+        ((= i 0) ; если первый элемент <br>
+         (display "первый:\t\t") <br>
+         (set! result (+ result (f a))) ; то добавить функцию от элемента <br>
+         (display "x") (display i) (display " = ") (display  a) <br>
+         (display "; y")(display i) (display " = ") (display (f a))(newline) <br>
+         (set! i (+ i 1))) <br>
+        ((= i n) ; если последний элемент <br>
+         (display "последний:\t") <br>
+         (set! result (+ result (f a))) ; то добавить функцию от элемента <br>
+         (display "x") (display i) (display " = ") (display a) <br>
+         (display "; y")(display i) (display " = ") (display (f a))(newline) <br>
+         (set! i (+ i 1))) <br>
+        ((= (modulo i 2) 0) ; если четный элемент <br>
+         (display "четный:\t\t") <br>
+         (set! result (+ result  (* 2(f a)))) ; то добавить функцию от элемента * 2 <br>
+         (display "x") (display i) (display " = ") (display a) <br>
+          (display "; y")(display i) (display " = ") (display (f a))(newline) <br>
+         (set! i (+ i 1))) <br>
+        ((not(= (modulo i 2) 0)) ; если нечетный элемент <br>
+         (display "нечетный:\t") <br>
+         (set! result (+ result (* 4(f a)))) ; то добавить функцию от элемента * 4 <br>
+         (display "x") (display i) (display " = ") (display a) <br>
+         (display "; y")(display i) (display " = ") (display (f a)) (newline) <br>
+         (set! i (+ i 1))) <br>
+        ) <br>
+  (if (<= a b) ; выполнять рекурсивный вызов пока левая граница меньше правой <br>
+      (simpson-method f (+ a h) b h n)) <br>
+  ) <br>
+<br>
+        
+;(display "Лаб №3 задание 2.2:") (newline) <br>
+(define n 6) <br>
+(simpson-method integral 0 PI (/ (- PI 0) n) n) <br>
+</pre>
+		<h3>Скриншот результатов:</h3>
+		<img src="result_2.jpg">
+		<p>На скриншоте приве</p>
+		<h3>Анализ достоверности результатов:</h3>
+		<p>Для сравнения результатов был использован онлайн сервис https://math.semestr.ru/optim/simpson.php для решения интегралов методом Симпсона.</p>
+		<h3>Скриншот проверки результата работы метода Симпсона:</h3>
+		<img src="example_2.jpg" width="90%">
+		<h3><a href="https://github.com/vbrovenk/functional_programming/blob/main/Practice_3/Lab3.rkt">Перейти к исходному коду</a></h3>
+		<h3>Выводы: <a name="conclusion"></a></h3>
+		<p> В лабораторной работе были реализованы процедуры для решения задач:<br>
+		<ol>
+			<li>процедура для решения нелинейного уравнения методом Ньютона;</li>
+			<li>процедура для решения нелинейного уравнения методом простых итераций;</li>
+			<li>процедура для численного интегрирования функций одной переменной методом Симпсона;</li>
+		</ol>
+		</p>
+		<p>
+			При выполнении 3 лабораторной работы возникали трудности с пониманием как работают математические методы, которые необходимо было реализовать.
+		</p>
+	</div>
+	
+</body>
+</html>
