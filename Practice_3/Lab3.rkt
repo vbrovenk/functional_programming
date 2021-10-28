@@ -129,6 +129,6 @@
   )
 
         
-(display "Лаб №3 задание 2.2:") (newline)
-(define n 6)
-(simpson-method integral 0 PI (/ (- PI 0) n) n)
+;(display "Лаб №3 задание 2.2:") (newline)
+;(define n 6)
+;(simpson-method integral 0 PI (/ (- PI 0) n) n)
