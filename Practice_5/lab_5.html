@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Practice 5</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<p align="center">
+		Київський національний університет імені Тараса Шевченка<br>
+		Факультет інформаційних технологій<br>
+		Кафедра програмних систем та технологій<br>
+		<br>
+		студент групи IПЗ-42<br>
+		Бровенко Вадим<br>
+		2021
+	</p>
+	<br>
+
+	<div class="inner">
+		<h2 align="center">
+		Лабораторная робота №5 <br>
+		Тема: Обработка рациональных и комплексных чисел языками функционального программирования<br>
+	</h2>
+		<h3 align="center">Вариант 2</h3>
+		<h3>Cодержание</h3>
+		<a href="#choose">Обоснование выбора языка программирования и IDE</a> <br>
+		<a href="#task1">Задание 1</a> <br>
+		<a href="#task2">Задание 2</a> <br>
+		<a href="#conclusion">Выводы</a>
+
+
+		<h3>Обоснование выбора языка программирования и IDE <a name="choose"></a></h3>
+		<p>
+			Для выполнения задач был выбран язык программирования Scheme, т.к. он является строго функциональным и прост в освоении благодаря упрощенному синтаксису языка.<br>
+			Среда разработки была выбрана DrRacket, так как она является бесплатной и имеет понятный и упрощенный интерфейс.
+		</p>
+		<h2>Задание 1. <a name="task1"></a></h2> <p>Найти сумму четырех дробей 1/a + 1/b + 1/c + 1/d, где a, b, c, d - нечетные натуральные числа. Если сумма этих дробей равна 1, то вывести сообщение "YES", иначе "NO". Для решения задачи написать процедуру приведения дробей к общему знаменателю.
+			</p>
+		<h3>HIPO-диаграмма:</h3>
+		<img src="hipo_1.png">
+		<h3>Код программы с комментариями:</h3>
+<pre class="code">
+; =============== Zadanie 1 =============== <br>
+; поиск НОД для 2 чисел метод Евклида <br>
+; НОД(a, b) = НОД(b,r) r = остаток от деления a и b <br>
+(define (my-gcd a b) <br>
+  (if (= b 0) <br>
+      a <br>
+      (my-gcd b (remainder a b)))) <br>
+; получение числителя <br>
+(define (chislitel x) <br>
+  ; поиск НОД для сокращения дроби <br>
+  (let ((g (my-gcd (car x) (cdr x)))) <br>
+    (/ (car x) g))) <br>
+; получение знаменателя <br>
+(define (znamenatel x) <br>
+  ; поиск НОД для сокращения дроби <br>
+  (let ((g (my-gcd (car x) (cdr x)))) <br>
+    (/ (cdr x) g))) <br>
+; создание рационального числа <br>
+(define (create-rational c z) <br>
+  (cons c z)) <br>
+; вывод рационального числа <br>
+(define (print-rational x) <br>
+  (display (chislitel x)) <br>
+  (display "/") <br>
+  (display (znamenatel x))) <br>
+<br>
+; вывод суммы исходных рациональных чисел<br>
+(define i 4)<br>
+(define (print-source-rat list-nbrs)<br>
+  ; пока есть элементы в списке<br>
+  (cond ((not (null? list-nbrs))<br>
+         (print-rational (cons 1 (car list-nbrs))) <br>
+         (cond ((= i 1) ; если элемент последний<br>
+                (display " = "))<br>
+               (else<br>
+                (display " + ")))<br>
+         (set! i (- i 1)) ; уменьшение счетчика чисел<br>
+         (print-source-rat (cdr list-nbrs))))) ; переход к следующему числу<br>
+         <br>
+; поиск НОК для нескольких чисел = lcm(lcm(lcm(a b) c) d)<br>
+(define (my-lcm list-nbrs)<br>
+  (define a (car list-nbrs)) ; определение 1-го числа<br>
+  (define b (car (cdr list-nbrs))) ; определение 2-го числа<br>
+  (display "НОК для 4 чисел:") (newline)<br>
+  (set! list-nbrs (cdr (cdr list-nbrs))) ; убрать из списка первые 2 числа<br>
+  (define (iter-lcm)<br>
+    (display "a = ")(display a) (display "| b = ") (display b) (newline)<br>
+    ; НОК для двух чисел = (a * b) / gcd(a b)<br>
+    (set! a (/ (* a b) (my-gcd a b)))<br>
+    ; если список чисел не пуст<br>
+    (cond ((not (null? list-nbrs))<br>
+           (set! b (car list-nbrs)) ; для b назначается следующее число из списка<br>
+           (set! list-nbrs (cdr list-nbrs)) ; из списка удаляется это число<br>
+           (iter-lcm)) ; переход к следующей итерации<br>
+          (else<br>
+           a))) ; иначе найдено НОК для чисел<br>
+  <br>
+  (iter-lcm)         <br>
+  )<br>
+<br>
+; расчет суммы рациональных чисел<br>
+(define j 4)<br>
+(define (find-sum list-znams)<br>
+  (define common-chislitel 0) ; сумма в числителе<br>
+  (define common-devider (my-lcm odd-nbrs)) ; расчет общего знаменателя<br>
+  (display "НОК = ") (display common-devider) (newline)<br>
+  (print-source-rat list-znams) ; вывод исходной суммы<br>
+  (define (iter-sum list-znams)<br>
+    ; если есть знаменатели<br>
+    (cond ((not (null? list-znams))<br>
+           ; к общему числителю добавить вычисленный числитель рац числа<br>
+           (set! common-chislitel<br>
+                 (+ common-chislitel ( / common-devider (car list-znams))))<br>
+           ; вывод рационального числа после приведения к общему знаменателю<br>
+           (display ( / common-devider (car list-znams)))<br>
+           (display "/")<br>
+           (display common-devider)<br>
+           (if (= j 1)<br>
+               (display " = ")<br>
+               (display " + "))<br>
+           (set! j (- j 1))<br>
+           <br>
+           (iter-sum (cdr list-znams))) ; переход к следующей итерации<br>
+          (else ; иначе все рац числа сложены<br>
+           (display common-chislitel)<br>
+           (display "/")<br>
+           (display common-devider) (display " = ")<br>
+           ; создание рационального числа (для возможного сокращения)<br>
+           (let ((result-rat (create-rational common-chislitel common-devider)))<br>
+             (print-rational result-rat) (newline)<br>
+             ; проверка на равность 1<br>
+             (if (= 1 (/ (chislitel result-rat) (znamenatel result-rat)))<br>
+                 (display "YES")<br>
+                 (display "NO")))<br>
+           (newline))))<br>
+  (iter-sum list-znams)<br>
+  )<br>
+  <br>
+; создание списка рациональных чисел<br>
+(define odd-nbrs (list 4 2 7 9))<br>
+; сумма заданных рациональных чисел<br>
+(find-sum odd-nbrs) <br>
+
+</pre>
+		<h3>Скриншот результата работы программы:</h3>
+		<img src="result_1.jpg">
+		<h3>Анализ достоверности результатов:</h3>
+		<p>Для проверки правильной работы программы был использован онлайн калькулятор https://ru.onlinemschool.com/math/assistance/fraction/calculator/</p>
+		<h3>Скриншот результата работы онлайн калькулятора:</h3>
+		<img src="example_1.jpg">
+		<h2>Задание 2. <a name="task2"></a></h2> <p>Создать список из комплексных чисел, заданных в алгебраичной форме в декартовых координатах z = a + bi. Создать новый список, элементы которого есть комплексные числа, переведенные из декартовых координат в полярные. Комплексное число в полярных координатах состоит из модуля |z| = sqrt(a^2 + b^2) и аргумента arg z = arctg(b, a). Напечатать новый список.</p>
+		<h3>HIPO-диаграмма:</h3>
+		<img src="hipo_2.png">
+		<h3>Код программы с комментариями:</h3>
+<pre class="code">
+; =============== Zadanie 2 =============== <br>
+; ---------- Декартова форма<br>
+; получить действительную часть компл числа<br>
+(define (my-real-part z)<br>
+  (car z))<br>
+; получить мнимую часть компл числа<br>
+(define (my-imag-part z)<br>
+  (cdr z))<br>
+; создать компл число (действ и мнимая части)<br>
+(define (make-real-imag a b)<br>
+  (cons a b))<br>
+; вывести комплексное число в декартовой форме<br>
+(define (print-real-imag z)<br>
+  (display (my-real-part z))<br>
+  (display " + ")<br>
+  (display (my-imag-part z))<br>
+  (display "i"))<br>
+<br>
+; ---------- Полярная форма<br>
+; получение модуля из декартовой формы<br>
+(define (modul z)<br>
+  (sqrt (+ (expt (my-real-part z) 2) (expt (my-imag-part z) 2))))<br>
+; получение аргумента из декартовой формы<br>
+(define (argument z)<br>
+  (atan (my-imag-part z) (my-real-part z)))<br>
+; перевод из декартовой в полярную форму<br>
+(define (make-polar-from-real-imag z)<br>
+  (cons (modul z) (argument z)))<br>
+; вывести комплексное число в полярной форме<br>
+(define (print-modul-arg z)<br>
+  (display "|z| = ")<br>
+  (display (car z))<br>
+  (display " arg = ")<br>
+  (display (cdr z)))<br>
+<br>
+; список компл чисел в полярной форме<br>
+(define list-modul-arg (list))<br>
+<br>
+; список компл чисел в декартовой форме<br>
+(define list-real-imag (list))<br>
+<br>
+; создание списка чисел в декартовой форме заданного кол-ва<br>
+(define (create-list-real-imag count)<br>
+  (define (list-iter r i)<br>
+    ; если последнее число<br>
+    (cond ((< count 2)<br>
+           ; вернуть комплексное число<br>
+           (make-real-imag r i))<br>
+          (else<br>
+           ; уменьшить счетчик кол-ва чисел<br>
+           (set! count (- count 1))<br>
+           ; рекурсивный вызов для следующего компл числа<br>
+           (cons (make-real-imag r i) (list-iter (+ r 2) (+ i 1))))))<br>
+  ; вызов рекурсии для создания списка <br>
+  (list-iter 1 2)<br>
+  )<br>
+<br>
+; создание списка чисел в полярной форме из списка чисел в декартовой форме<br>
+(define (create-list-modul-arg dekart-list)<br>
+  ; если список не пустой и car(list) не пара - значит это последняя пара списка<br>
+  (cond ((and (not (null? dekart-list)) (not (pair? (car dekart-list))))<br>
+         (make-polar-from-real-imag dekart-list)) ; создать полярную форму из декартовой<br>
+        (else<br>
+         ; иначе рекурсивно соединять результаты преобразований в полярную форму<br>
+         (cons (make-polar-from-real-imag (car dekart-list))<br>
+               (create-list-modul-arg (cdr dekart-list)))<br>
+         )<br>
+        )<br>
+  )<br>
+<br>
+; вывод списков комплексных чисел в двух формах форме<br>
+(define (print-two-forms dekart-nbrs polar-nbrs)<br>
+  ; если список не пустой и первый элемент пара<br>
+  (cond ((and (not (null? dekart-nbrs)) (pair? (car dekart-nbrs)))<br>
+         (print-real-imag (car dekart-nbrs)) ; вывесте компл число в декартовом виде<br>
+         (display "\t\t\t")<br>
+         (print-modul-arg (car polar-nbrs)) ; вывесте компл число в полярном виде<br>
+         (newline)<br>
+         (print-two-forms (cdr dekart-nbrs) (cdr polar-nbrs)))<br>
+        (else ; иначе последняя пара в списке<br>
+         (print-real-imag dekart-nbrs)<br>
+         (display "\t\t\t")<br>
+         (print-modul-arg polar-nbrs)<br>
+         (newline))))<br>
+<br>
+; создание списка компл чисел<br>
+(set! list-real-imag (create-list-real-imag 4))<br>
+(display "Список в декартовой форме:")(display list-real-imag) (newline)<br>
+<br>
+;(display "Комплексные числа в полярной форме:")<br>
+(set! list-modul-arg (create-list-modul-arg list-real-imag))<br>
+<br>
+(display "Декартова форма: \tПолярная форма") (newline)<br>
+; вывод двух форм комплексных чисел<br>
+(print-two-forms list-real-imag list-modul-arg)<br>
+
+</pre>
+		<h3>Скриншот результатов:</h3>
+		<img src="result_2.jpg">
+		<h3>Анализ достоверности результатов:</h3>
+		<p>Для сравнения результата работы созданной программы был использован онлайн калькулятор для работы с комплексными числами https://planetcalc.ru/7935/</p>
+		<h3>Скриншоты результатов работы онлайн калькулятора:</h3>
+		<table>
+			<tr>
+				<td><img src="example_2.1.jpg"></td>
+				<td><img src="example_2.2.jpg"></td>
+			</tr>
+			<tr>
+				<td><img src="example_2.3.jpg"></td>
+				<td><img src="example_2.4.jpg"></td>
+			</tr>
+		</table>
+		<h3><a href="https://github.com/vbrovenk/functional_programming/blob/main/Practice_5/Lab5.rkt">Перейти к исходному коду</a></h3>
+		<h3>Выводы: <a name="conclusion"></a></h3>
+		<p> В лабораторной работе были реализованы:<br>
+		<ol>
+			<li>процедура для вычисления суммы рациональных чисел, для которой были созданы вспомогательные функции: вычисление НОД методом Евклида, и для поиска общего знаменателя - функция поиска НОК;</li>
+			<li>процедура преобразования комплексных чисел из декартовой формы в полярную форму, для которой были созданы вспомогательные функции: функции для работы с комплексным числом и создание списка комплексных чисел в декартовой форме, функция для создания списка комплексных чисел в полярной форме.</li>
+		</ol>
+		</p>
+		<p>
+			При анализе результатов работы реализованных программ с онлайн калькуляторами было определено, что результаты идентичные - означает, что функции отрабатывают верно.
+		</p>
+		<p>
+			При выполнении 5 лабораторной работы возникали трудности при реализации списка пар, сначала список создавался последовательным добавлением пар в список, что привело к неверным результатам при извлечении пар из списка. Для решения данной проблемы принцип добавления пар был заменен на рекурсивное добавление начиная с последней пары.
+		</p>
+	</div>
+	
+</body>
+</html>
