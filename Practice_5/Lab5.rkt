@@ -97,7 +97,7 @@
   )
   
 ; создание списка рациональных чисел
-;(define odd-nbrs (list 3 9 5 7))
+;(define odd-nbrs (list 3 9 5 3))
 ; сумма заданных рациональных чисел
 ;(find-sum odd-nbrs)
 

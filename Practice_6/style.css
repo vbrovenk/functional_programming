@@ -1,0 +1,10 @@
+div.inner {
+	width: 70%;
+	margin: 10px auto;
+}
+
+pre.code {
+	background-color: lightgray;
+	border-radius: 20px;
+	padding: 20px;
+}

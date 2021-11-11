@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Practice 6</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<p align="center">
+		Київський національний університет імені Тараса Шевченка<br>
+		Факультет інформаційних технологій<br>
+		Кафедра програмних систем та технологій<br>
+		<br>
+		студент групи IПЗ-42<br>
+		Бровенко Вадим<br>
+		2021
+	</p>
+	<br>
+
+	<div class="inner">
+		<h2 align="center">
+		Лабораторная робота №6 <br>
+		Тема: Обработка структур типа векторов и матриц, стеков и очередей языками функционального программирования<br>
+	</h2>
+		<h3 align="center">Вариант 2</h3>
+		<h3>Cодержание</h3>
+		<a href="#choose">Обоснование выбора языка программирования и IDE</a> <br>
+		<a href="#task1">Задание 1</a> <br>
+		<a href="#task2">Задание 2</a> <br>
+		<a href="#conclusion">Выводы</a>
+
+
+		<h3>Обоснование выбора языка программирования и IDE <a name="choose"></a></h3>
+		<p>
+			Для выполнения задач был выбран язык программирования Scheme, т.к. он является строго функциональным и прост в освоении благодаря упрощенному синтаксису языка.<br>
+			Среда разработки была выбрана DrRacket, так как она является бесплатной и имеет понятный и упрощенный интерфейс.
+		</p>
+		<h2>Задание 1. <a name="task1"></a></h2> <p>Создать вектор. Вычислить сумму элементов между максимальным и минимальным значениями вектора. Вывести на экран максимальный, минимальный элементы массива, их индексы и искомую сумму элементов.</p>
+
+		<h3>Код программы с комментариями:</h3>
+<pre class="code">
+; ================ Zadanie 1 ================ <br>
+; поиск индекса максимального элемента <br>
+(define (find-max-elem in-vector) <br>
+  (define max-index 0) ; первичное задание максимального элемента <br>
+  (define (max-iter index) <br>
+    (cond ((and (< index (vector-length in-vector)) ; если не вышли за пределы размера вектора <br>
+                ; и найден больший элемент в векторе <br>
+                (> (vector-ref in-vector index) (vector-ref in-vector max-index))) <br>
+           (set! max-index index) ; устанавливается новый индекс максимального числа <br>
+           (max-iter (+ index 1))) <br>
+          ((< index (vector-length in-vector)) ; если не вышли за пределы размера вектора <br>
+           (max-iter (+ index 1))) ; переход к следующему числу <br>
+          (else <br>
+           max-index))) ; иначе вернуть найденный индекс <br>
+  <br>
+  (max-iter 1)) ; вызов рекурсии со 2 элемента <br>
+<br>
+; поиск индекса минимального элемента <br>
+(define (find-min-elem in-vector) <br>
+  (define min-index 0) ; первичное задание максимального элемента <br>
+  (define (min-iter index) <br>
+    (cond ((and (< index (vector-length in-vector)) ; если не вышли за пределы размера вектора <br>
+                ; и найден меньший элемент в векторе <br>
+                (< (vector-ref in-vector index) (vector-ref in-vector min-index))) <br>
+           (set! min-index index) ; устанавливается новый индекс минимального числа <br>
+           (min-iter (+ index 1))) <br>
+          ((< index (vector-length in-vector)) ; если не вышли за пределы размера вектора <br>
+           (min-iter (+ index 1))) ; переход к следующему числу <br>
+          (else <br>
+           min-index))) ; иначе вернуть найденный индекс <br>
+  <br>
+  (min-iter 1)) ; вызов рекурсии со 2 элемента <br>
+<br>
+; вычисление суммы между минимальным и макимальным индексами <br>
+(define (sum-between min-index max-index in-vector) <br>
+  (define (sum-iter start-index end-index sum) <br>
+    (cond ((<= start-index end-index) ; пока не закончились элементы между start и end <br>
+           ; к сумме добавить элемент из вектора и перейти к следующему элементу <br>
+           (sum-iter (+ start-index 1) end-index (+ sum (vector-ref in-vector start-index))) ) <br>
+          (else <br>
+           sum))) ; иначе вернуть сумму <br>
+  <br>
+  ; если min индекс меньше max индекса <br>
+  (if (< min-index max-index) <br>
+      (sum-iter min-index max-index 0) ; запуск рекурсии от min до max <br>
+      (sum-iter max-index min-index 0)); иначе запуск рекурсии от max до min <br>
+  ) <br>
+<br>
+; создание вектора <br>
+(define vector-nbrs (vector 1 20 1 4 -5 6)) <br>
+(display "Вектор: ") (display vector-nbrs) (newline) <br>
+<br>
+(define min-index (find-min-elem vector-nbrs)) ; поиск индекса минимального числа <br>
+(define min-number (vector-ref vector-nbrs min-index)) <br>
+(display "Минимальное число: ") (display min-number) <br>
+(display " с индексом: ") (display min-index) (newline) <br>
+<br>
+(define max-index (find-max-elem vector-nbrs)) ; поиск индекса максимального числа <br>
+(define max-number (vector-ref vector-nbrs max-index)) <br>
+(display "Максимальное число: ") (display max-number) <br>
+(display " с индексом: ") (display max-index) (newline) <br>
+<br>
+(display "Сумма между min и max индексами: ") <br>
+(sum-between min-index max-index vector-nbrs) <br>
+
+</pre>
+		<h3>Скриншот результата работы программы:</h3>
+		<img src="result_1.jpg">
+		<h3>Анализ достоверности результатов:</h3>
+		<p>На представленном скриншоте наглядно можно убедиться в правильных результатах работы функций: <br>для вектора чисел: 1, 20, 1, 4, -5, 6<br>
+    минимальным элементом является -5(индекс 4), а максимальным элементом 20(индекс 1); <br>элементы находящиеся между ними: 20, 1, 4, -5 сумма которых равна 20.</p>
+		
+		<h2>Задание 2. <a name="task2"></a></h2> <p>Создать очередь из чисел. Расчитать их среднее арифметическое и среднее геометрическое. Напечатать содержимое очереди, определить количество ее элементов.</p>
+		<h3>HIPO-диаграмма:</h3>
+		<img src="hipo_2.png">
+		<h3>Код программы с комментариями:</h3>
+<pre class="code">
+; ================ Zadanie 2 ================ <br>
+; представление списка в виде пары: (голова, конец) <br>
+; получение указателя на начало очереди <br>
+(define (head-ptr queue) <br>
+  (car queue)) <br>
+<br>
+; получение указателя на конец очереди <br>
+(define (tail-ptr queue) <br>
+  (cdr queue))<br>
+<br>
+; изменение указателя начала очереди <br>
+(define (set-head-ptr! queue elem) <br>
+  (set-car! queue elem)) <br>
+<br>
+; изменение указателя конца очереди <br>
+(define (set-tail-ptr! queue elem) <br>
+  (set-cdr! queue elem)) <br>
+<br>
+; очередь пустая, если указатель на начало пустой <br>
+(define (empty-queue? queue) <br>
+  (null? (head-ptr queue))) <br>
+<br>
+; создание очереди - пустой <br>
+(define (create-queue) <br>
+  (cons (list) (list))) <br>
+<br>
+; обращение к голове очереди <br>
+(define (head-queue queue) <br>
+  (if (empty-queue queue) <br>
+      (display "head-queue error: обращение к пустой очереди") <br>
+      (car (front-ptr queue)))) <br>
+<br>
+; добавление элемента в конец очереди <br>
+(define (push-queue! queue elem) <br>
+  (let ((new-pair (cons elem (list)))) ; новая пара: элемент, пустой список <br>
+    (cond ((empty-queue? queue) ; если очередь пустая, то <br>
+           (set-head-ptr! queue new-pair) ; и начало очереди <br>
+           (set-tail-ptr! queue new-pair)) ; и конец указывают на новый элемент <br>
+          (else ; в противном случае <br>
+           (set-cdr! (tail-ptr queue) new-pair) ; изменить последнюю пару очереди <br>
+           (set-tail-ptr! queue new-pair) ; перенаправление хвостового указателя на последний элемент <br>
+           )))) <br>
+<br>
+; удаление элемента из начала очереди <br>
+(define (pop-queue! queue) <br>
+  (cond ((empty-queue? queue) ; если очереди пустая <br>
+         (display "pop error: обращение к пустой очереди")) <br>
+        (else <br>
+         ; иначе перенаправление головного указателя на второй элемент очереди <br>
+         (set-head-ptr! queue (cdr (head-ptr queue))) <br>
+         )))<br>
+<br>
+; определение кол-ва элементов в очереди <br>
+(define (size-queue queue) <br>
+  (define (iter-queue elems length) <br>
+    (cond ((null? elems) ; если элементов нет <br>
+           length) ; вернуть найденное кол-во элементов <br>
+          (else <br>
+           (iter-queue (cdr elems) (+ length 1))))) ; переход к cdr от списка элементов <br>
+  <br>
+  (iter-queue (head-ptr queue) 0)) <br>
+<br>
+; среднее арифметическое <br>
+(define (ariphmetic-mean queue) <br>
+  (define (iter-queue elems sum) <br>
+    (cond ((null? elems) ; если элементов нет <br>
+           (display sum) (display "/") (display (size-queue queue)) <br>
+           (display " = ") <br>
+           (/ sum (size-queue queue))) ; вернуть сумму элементов деленное на кол-во <br>
+          (else <br>
+           (iter-queue (cdr elems) (+ sum (car elems)))))) ; переход к cdr от списка элементов <br>
+  <br>
+  (iter-queue (head-ptr queue) 0.0)) <br>
+<br>
+; среднее геометрическое <br>
+(define (geometric-mean queue)<br>
+  (define (iter-queue elems product) <br>
+    (cond ((null? elems) ; если элементов нет <br>
+           (display product) (display "^1/") (display (size-queue queue)) <br>
+           (display " = ") <br>
+           (expt product (/ 1 (size-queue queue)))) ; вернуть произведение в степени 1/кол-во элементов <br>
+          (else <br>
+           (iter-queue (cdr elems) (* product (car elems)))))) ; переход к cdr от списка элементов <br>
+  <br>
+  (iter-queue (head-ptr queue) 1.0)) <br>
+<br>
+; создание очереди и добавление чисел<br>
+(define queue-nbrs (create-queue))<br>
+(push-queue! queue-nbrs 3)<br>
+(push-queue! queue-nbrs 5)<br>
+(push-queue! queue-nbrs 8)<br>
+(push-queue! queue-nbrs 11)<br>
+(push-queue! queue-nbrs 15)<br>
+(push-queue! queue-nbrs 21)<br>
+<br>
+(display "Очередь из чисел: ")<br>
+(display (head-ptr queue-nbrs)) (newline)<br>
+(display "Размер очереди: ")<br>
+(display (size-queue queue-nbrs)) (newline)<br>
+(display "Среднее арифметическое: ")<br>
+(display (ariphmetic-mean queue-nbrs)) (newline)<br>
+(display "Среднее геометрическое: ")<br>
+(display (geometric-mean queue-nbrs)) (newline)<br>
+<br>
+</pre>
+		<h3>Скриншот результатов:</h3>
+		<img src="result_2.jpg">
+		<h3>Анализ достоверности результатов:</h3>
+		<p>При добавление элементов: 3, 5, 8, 11, 15, 21 в очередь, ожидается получение очереди, в которой будет этот же порядок чисел, что и указано в скриншоте, отображающего работу функций создания очереди и добавления в нее элементов. Для сравнения результатов среднего арифметического и среднего геометрического был использован онлайн калькулятор <br> 
+    https://umath.ru/calc/srednee-arifmeticheskoe-i-srednee-geometricheskoe-chisel-onlajn/</p>
+    <h3>Скриншот работы онлайн калькулятора:</h3>
+    <img src="example_2.jpg">
+		<h3><a href="https://github.com/vbrovenk/functional_programming/blob/main/Practice_6/Lab6.rkt">Перейти к исходному коду</a></h3>
+		<h3>Выводы: <a name="conclusion"></a></h3>
+		<p> В лабораторной работе были реализованы:<br>
+		<ol>
+			<li>процедура для вычисления суммы чисел вектора, которые находятся в промежутке между минимальным числом и максимальным, так же были реализованы вспомогательные функции для поиска максимального элемента в векторе чисел и минимального;</li>
+			<li>процедуры для расчета среднего арифметического и среднего геометрического чисел, находящихся в очереди. Для этого были созданы функции которые обрабатывают очереди по правилам FIFO. Очередь была описана с помощью пары, которая хранит указатели на начало и конец очереди, что позволяет избежать постоянного перебора всех элементов в очереди для получения последнего.</li>
+		</ol>
+		</p>
+		<p>
+			При анализе результатов работы реализованных программ с онлайн калькулятором было определено, что результаты идентичные - означает, что функции отрабатывают верно.
+		</p>
+		<p>
+			При выполнении 2 задания для реализации очереди были использованы стандартные простые функции set-car! и set-cdr!, которые позволяют изменять значения пар. Так как очередь была представлена в виде пары, в которой хранятся указатели на начало и конец очереди, необходимо было изменять эти значения в паре при добавлении/удалении элемента из очереди.
+		</p>
+	</div>
+	
+</body>
+</html>
