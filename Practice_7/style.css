@@ -1,0 +1,23 @@
+div.inner {
+	width: 70%;
+	margin: 10px auto;
+}
+
+pre.code {
+	background-color: lightgray;
+	border-radius: 20px;
+	padding: 20px;
+}
+
+table img {
+	width: 100%;
+}
+
+table td {
+	border: 1px solid black;
+}
+
+table td p {
+	text-align: center;
+	font-weight: bold;
+}

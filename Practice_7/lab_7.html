@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Practice 7</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<p align="center">
+		Київський національний університет імені Тараса Шевченка<br>
+		Факультет інформаційних технологій<br>
+		Кафедра програмних систем та технологій<br>
+		<br>
+		студент групи IПЗ-42<br>
+		Бровенко Вадим<br>
+		2021
+	</p>
+	<br>
+
+	<div class="inner">
+		<h2 align="center">
+		Лабораторная робота №7 <br>
+		Тема: Обработка строк и файлов языками функционального программирования<br>
+	</h2>
+		<h3 align="center">Вариант 2</h3>
+		<h3>Cодержание</h3>
+		<a href="#choose">Обоснование выбора языка программирования и IDE</a> <br>
+		<a href="#task1">Задание 1</a> <br>
+		<!-- <a href="#task2">Задание 2</a> <br> -->
+		<a href="#conclusion">Выводы</a>
+
+
+		<h3>Обоснование выбора языка программирования и IDE <a name="choose"></a></h3>
+		<p>
+			Для выполнения задач был выбран язык программирования Scheme, т.к. он является строго функциональным и прост в освоении благодаря упрощенному синтаксису языка.<br>
+			Среда разработки была выбрана DrRacket, так как она является бесплатной и имеет понятный и упрощенный интерфейс.
+		</p>
+		<h2>Задание 1. <a name="task1"></a></h2> <p>Записать в текстовый файл n строк текста, которые задаются программой на функциональном языке программирования. Считать строки из созданного программой файла, вывести их на экран. Посчитать количество повторений каждой буквы в строках текста. Заменить заданную пользователем букву в тексте на её порядковый номер в алфавите. Записать в новый текстовый файл результат обработки текста.</p>
+    <h3>HIPO диаграмма:</h3>
+    <img src="hipo_1.png">
+		<h3>Код программы с комментариями:</h3>
+<pre class="code">
+#lang racket <br>
+<br>
+; ============== Zadanie 1 ============== <br>
+; запись в файл n строк <br>
+(define (write-to-file filename) <br>
+  ;(delete-file filename) ; удалить файл, когда он существует <br>
+  (display "Input count of lines n=") <br>
+  (define n (read-line)) <br>
+  (set! n (string->number n)) ; преобразование в число <br>
+  (define fd (open-output-file filename)) ; открытие файла на запись <br>
+  ; запись поочередно строк с файл <br>
+  (define (write-lines i) <br>
+    (cond ((< i n) <br>
+           (display i) (display " line: ") <br>
+           (define tmp-line (read-line)) ; считывание строки с клавиатуры <br>
+           (display tmp-line fd) ; запись строки в файл <br>
+           (newline fd) <br>
+           (write-lines (+ i 1))))) ; переход к записи следующей строки <br>
+<br> 
+  (write-lines 0) <br>
+  ; закрытие файла <br>
+  (close-output-port fd)) <br>
+<br>
+; вектор обработанных символов <br>
+(define used-letters (vector)) <br>
+; вектор количества повторений обработанных символов <br>
+(define count-used-letters (vector)) <br>
+<br>
+; проверка символа на букву <br>
+(define (allow-letter? letter) <br>
+  ; создание вектора из недопустимых символов <br>
+  (define forbidden-symbols (list->vector (string->list "0123456789 .,!?"))) <br>
+  (define forbidden-length (vector-length forbidden-symbols)) <br>
+  ; проход по вектору недопустимых символов <br>
+  (define (iter-symbols i) <br>
+    ; если рассматриваемый символ совпадает с недопустимым <br>
+    (cond ((and (< i forbidden-length) (eq? letter (vector-ref forbidden-symbols i))) <br>
+           #f) ; то вернуть false <br>
+          ((< i forbidden-length) <br>
+           (iter-symbols (+ i 1))) ; переход к следующему недопустимому символу <br>
+          (else <br>
+           #t))) ; иначе совпадений нет <br>
+  <br>
+  (iter-symbols 0)) <br>
+ <br>
+; обработка символа <br>
+(define (check-letter letter) <br>
+  (define used-length (vector-length used-letters)) <br>
+  ; проход по уже обработанным символам <br>
+  (define (iter-check i) <br>
+    ; если рассматриваемый символ уже находится в векторе <br>
+    (cond ((and (< i used-length) (eq? letter (vector-ref used-letters i))) <br>
+           ; то он учитывается, добавлением 1 к соответсвующему элементну вектора повторений <br>
+           (vector-set! count-used-letters i (+ (vector-ref count-used-letters i) 1))) <br>
+          ((< i used-length) ; если не вышли за пределы вектора <br>
+           (iter-check (+ i 1))) ; переход к следующему обработанному символу <br>
+          (else ; значит символ не встречался ранее <br>
+           ; необходимо добавить новый символ в вектор обработанных символов <br>
+           (set! used-letters (vector-append used-letters (vector letter))) <br>
+           ; добавить 1 в вектор количества повторений <br>
+           (set! count-used-letters (vector-append count-used-letters (vector 1)))))) <br>
+<br>
+  (cond ((allow-letter? letter) ; проверка символа: является ли буквой? <br>
+         (iter-check 0))) <br>
+  )<br>
+<br>
+; подсчет количества символов<br>
+(define (count-letters list-lines)<br>
+  ; проход по всем строкам<br>
+  (define (iter-lines lines)<br>
+    (cond ((not (null? lines)) ; пока есть строки<br>
+           (define current-line (car lines))<br>
+           (define size (string-length current-line)) ; запись длины строки<br>
+           ; проход по символам строки<br>
+           (define (iter-one-line i)<br>
+             (cond ((< i size)<br>
+                    ; передача символа на обработку<br>
+                    (check-letter (string-ref current-line i))<br>
+                    (iter-one-line (+ i 1)))))<br>
+<br>
+           (iter-one-line 0)<br>               
+           (iter-lines (cdr lines)))))<br>
+<br>
+  (iter-lines list-lines)<br>
+  <br>
+  (displayln "Count of letter repeating:")<br>
+  ; функция вывода букв и их кол-во повторений<br>
+  (define (display-vectors i)<br>
+    (cond ((< i (vector-length used-letters))<br>
+           (display (vector-ref used-letters i))<br>
+           (display " - ")<br>
+           (display (vector-ref count-used-letters i))<br>
+           (newline)<br>
+           (display-vectors (+ i 1)))))<br>
+<br>
+  (display-vectors 0)<br>
+  )<br>
+<br>
+; считывание содержимого файла<br>
+(define (read-from-file filename)<br>
+  (displayln "Output text content:")<br>
+  ; список для сохранения строк из файла<br>
+  (define list-lines (list))<br>
+  ; открытие файла на чтение<br>
+  (define fd (open-input-file filename))<br>
+  ; построчное чтение из файла<br>
+  (define (iter-read n)<br>
+    (define next-line (read-line fd)) ; считывание следующей строки<br>
+    (cond ((not (eof-object? next-line)) ; пока не достигнут конец файла<br>
+           (display n) (display ": ")<br>
+           (displayln next-line) ; вывод на консоль считанной строки<br>
+           ; добавление считанной строки в список<br>
+           (set! list-lines (append list-lines (list next-line)))<br>
+           (iter-read (+ n 1))))); переход к считыванию следующей строки<br>
+  <br>
+  (iter-read 0)<br>
+  ; закрытие файла<br>
+  (close-input-port fd)<br>
+  ; подсчет количества повторений символов<br>
+  (count-letters list-lines)<br>
+  )<br>
+<br>
+; функция для замены буквы на позицию в алфавите<br>
+(define (change-letter filename)<br>
+  ; открытие файла на чтение<br>
+  (define fd-read (open-input-file filename))<br>
+  ; открытие файла на запись<br>
+  (define fd-write (open-output-file "result.txt"))<br>
+  (display "Input LETTER to change: ")<br>
+  (define letter (read-line)) ; считывание буквы<br>
+  ; преобразование буквы в номер согласно ASCII<br>
+  (define position-in-alphabet (char->integer (string-ref letter 0)))<br>
+  <br>
+  ; если буква upper-case<br>
+  (cond ((<= position-in-alphabet 91)<br>
+         (set! position-in-alphabet (- position-in-alphabet 64)))<br>
+        (else ; иначе буква lower-case<br>
+          (set! position-in-alphabet (- position-in-alphabet 96))))<br>
+  (display "Position in alphabet: ")<br>
+  (displayln position-in-alphabet)<br>
+  ; построчное считывание из файла<br>
+  (define (iter-read)<br>
+    (define next-line (read-line fd-read)) ; считывание следующей строки<br>
+    (cond ((not (eof-object? next-line)) ; пока не достигнут конец файла<br>
+           (define length-line (string-length next-line)) ; запись длины строки<br>
+           (define (iter-line i) ; проход по символам строки<br>
+             ; если в строке найден символ совпадаюищий с заданным<br>
+             (cond ((and (< i length-line) (eq? (string-ref letter 0) (string-ref next-line i)))<br>
+                    ; вырезается подстрока до найденной буквы и добавляется порядковый номер<br>
+                    (define new-before (string-append (substring next-line 0 i) (number->string position-in-alphabet)))<br>
+                    ; переприсваивается текущая строка на новую с заменой буквы на порядквовый номер<br>
+                    (set! next-line (string-append new-before (substring next-line (+ i 1) length-line)))<br>
+                    ; перерасчет длины строки<br>
+                    (set! length-line (string-length next-line))<br>
+                    (iter-line (+ i 1))) ; переход к следующему символу<br>
+                   ((< i length-line)<br>
+                    (iter-line (+ i 1)))))<br>
+           ; запуск итеративного прохода по строке<br>
+           (iter-line 0)<br>
+           ; запись обработанной строки в файл<br>
+           (display next-line fd-write) (newline fd-write)<br>
+           (iter-read)))); переход к считыванию следующей строки<br>
+<br>
+  (iter-read)<br>
+  ; закрытие файла на чтение<br>
+  (close-input-port fd-read)<br>
+  ; закрытие файла на запись<br>
+  (close-output-port fd-write))<br>
+<br>
+; записать в файл строки, считанные с клавиатуры<br>
+(write-to-file "output.txt")<br>
+; вывести содержимое файла<br>
+(read-from-file "output.txt")<br>
+; замена буквы на порядковый номер в алфавите<br>
+(change-letter "output.txt")<br>
+<br>
+</pre>
+		<h3>Скриншот результата работы программы:</h3>
+		<img src="result_1.jpg">
+    <table>
+      <tr>
+        <td><p>Файл с исходным текстом</p></td>
+        <td><p>Файл с обработанным текстом</p></td>
+      </tr>
+      <tr>
+        <td><img src="source_text.jpg"></td>
+        <td><img src="new_text.jpg"></td>
+      </tr>
+    </table>
+		<h3>Анализ достоверности результатов:</h3>
+		<p>Чтобы убедиться в правильном подсчете количества повторений букв в тексте был использован онлайн сервис: https://www.siteprojects.ru/?article=seo-kolichestvo</p>
+		<h3>Скриншот результатов онлайн сервиса</h3>
+    <img src="example_1.jpg">
+    <p>Также на скриншотах, отображающих текстовые файлы, можно увидеть исходный текст, который был введен пользователем и записан в первый файл, затем пользователь ввел букву s (отображено на скриншоте консоли программы), которую необходимо заменить на её порядковый номер в алфавите. Буква s имеет 19 порядковый номер в алфавите, следовательно все буквы s в исходном тексте должны быть заменены на 19, что отображено на скриншоте Файл с обработанным текстом.</p>
+		<h3><a href="https://github.com/vbrovenk/functional_programming/blob/main/Practice_7/Lab7.rkt">Перейти к исходному коду</a></h3>
+		<h3>Выводы: <a name="conclusion"></a></h3>
+		<p> В лабораторной работе были реализованы:<br>
+		<ul>
+			<li>процедура считывания строк с клавиатуры и записи этих строк в файл;</li>
+      <li>процедура подсчета количества повторений букв в строках текста, для которой было использовано два вектора: вектор обработанных символов и вектор количества повторений, в которых под одним индексом находились символ и количество повторений данного символа;</li>
+      <li>процедура замены символа, заданного пользователем, на её порядковый номер в алфавите и запись обработанного текста в новый файл. Выполняется с помощью вырезания подстроки от начала до заданного символа и присоединения порядкового номера заданного символа, а затем присоединения подстроки от символа после заданного до конца строки.</li>
+		</ul>
+		</p>
+		<p>
+			При анализе результатов работы функции для подсчета количества повторений букв в тексте с онлайн сервисом было определено, что результаты идентичные - означает, что функция отрабатывает верно.
+		</p>
+    <p>
+      При анализе результатов работы функции для замены заданной буквы на ее порядковый номер в алфавите, определено, что в новый файл записывается обработанный текст, в котором все символы, равные заданному, заменяются на порядковый номер - следовательно функция работает как и ожидалось. 
+    </p>
+	</div>
+	
+</body>
+</html>

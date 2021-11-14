@@ -47,21 +47,21 @@
   )
 
 ; создание вектора
-(define vector-nbrs (vector 1 20 1 4 -5 6))
-(display "Вектор: ") (display vector-nbrs) (newline)
+;(define vector-nbrs (vector 1 20 1 4 -5 6))
+;(display "Вектор: ") (display vector-nbrs) (newline)
 
-(define min-index (find-min-elem vector-nbrs)) ; поиск индекса минимального числа
-(define min-number (vector-ref vector-nbrs min-index))
-(display "Минимальное число: ") (display min-number)
-(display " с индексом: ") (display min-index) (newline)
+;(define min-index (find-min-elem vector-nbrs)) ; поиск индекса минимального числа
+;(define min-number (vector-ref vector-nbrs min-index))
+;(display "Минимальное число: ") (display min-number)
+;(display " с индексом: ") (display min-index) (newline)
 
-(define max-index (find-max-elem vector-nbrs)) ; поиск индекса максимального числа
-(define max-number (vector-ref vector-nbrs max-index))
-(display "Максимальное число: ") (display max-number)
-(display " с индексом: ") (display max-index) (newline)
+;(define max-index (find-max-elem vector-nbrs)) ; поиск индекса максимального числа
+;(define max-number (vector-ref vector-nbrs max-index))
+;(display "Максимальное число: ") (display max-number)
+;(display " с индексом: ") (display max-index) (newline)
 
-(display "Сумма между min и max индексами: ")
-(sum-between min-index max-index vector-nbrs)
+;(display "Сумма между min и max индексами: ")
+;(sum-between min-index max-index vector-nbrs)
 
 ; ================ Zadanie 2 ================
 ; представление списка в виде пары: (голова, конец)
@@ -158,12 +158,12 @@
 (push-queue! queue-nbrs 15)
 (push-queue! queue-nbrs 21)
 
-;(display "Очередь из чисел: ")
-;(display (head-ptr queue-nbrs)) (newline)
-;(display "Размер очереди: ")
-;(display (size-queue queue-nbrs)) (newline)
-;(display "Среднее арифметическое: ")
-;(display (ariphmetic-mean queue-nbrs)) (newline)
-;(display "Среднее геометрическое: ")
-;(display (geometric-mean queue-nbrs)) (newline)
+(display "Очередь из чисел: ")
+(display (head-ptr queue-nbrs)) (newline)
+(display "Размер очереди: ")
+(display (size-queue queue-nbrs)) (newline)
+(display "Среднее арифметическое: ")
+(display (ariphmetic-mean queue-nbrs)) (newline)
+(display "Среднее геометрическое: ")
+(display (geometric-mean queue-nbrs)) (newline)
 
